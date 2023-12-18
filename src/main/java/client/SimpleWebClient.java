@@ -1,42 +1,37 @@
-import java.io.*; 
-import java.net.*; 
+package client;
 
-// Client Class 
+import java.io.*;
+import java.net.*;
+import java.util.HashMap;
+import java.util.Map;
+
 public class SimpleWebClient {
-  
-  public static void main(String[] args)
-{
-    // Establish a connnection with the server 
-    try (Socket socket = new Socket("localhost", 5000)){
 
-      // Write to server 
-      PrintWriter out = new PrintWriter(socket.getOutputStream(), true); 
+    public static void main(String[] args) {
+        try (Socket socket = new Socket("localhost", 5000)) {
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-      //  Reading from server 
-      BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
+            Thread.sleep(1000); // 1 second
 
-      // Simulate a delay 
-      Thread.sleep(1000); // 1 second 
+            Map<String, String> params = new HashMap<>();
+            params.put("account", "123");
+            params.put("value", "1000");
+            params.put("toAccount", "456");
+            params.put("toValue", "500");
 
-      // Prepare POST request data 
-      String postData = "account=123&value=1000&toAccount=456&toValue=500";
-            String httpRequest =  httpRequestBuilder.buildPostRequest("localhost", 5000, "/submit", postData); 
+            String httpRequest = HttpRequestBuilder.buildPostRequest("localhost", 5000, "/submit", params);
 
-            // Send HTTP request to the server
             out.println(httpRequest);
             out.flush();
 
-      // Read and print the server response 
-      String responseLine; 
-      while ((responseLine = in.readLine()) != null ) {
-        
-        // Display server response 
-        System.out.println("Server replied" + responseLine); 
-      }
-    } catch (IOException | InterruptedException e){
-      e.printStackTrace(); 
+            String responseLine;
+            while ((responseLine = in.readLine()) != null) {
+                System.out.println("Server replied: " + responseLine);
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
-  }
-} 
-
+}
 
